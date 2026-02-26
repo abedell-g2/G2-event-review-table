@@ -92,7 +92,7 @@
       <p id="qr-url-label" class="qr-url-label"></p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
         <button class="elv-btn elv-btn--primary" onclick="copyQrImage(this)">Copy Image</button>
-        <a id="qr-download-link" href="" download="qr-code.png" class="elv-btn elv-btn--ghost">Download PNG</a>
+        <button class="elv-btn elv-btn--ghost" onclick="downloadQrImage(this)">Download PNG</button>
       </div>
     </div>
   </div>
@@ -105,8 +105,23 @@ function showQrModal(url) {
   document.getElementById('qr-image').src = qrSrc;
   document.getElementById('qr-url-label').textContent = url;
   document.getElementById('qr-image').dataset.qrSrc = qrSrc;
-  document.getElementById('qr-download-link').href = qrSrc;
   document.getElementById('qr-modal').classList.remove('hidden');
+}
+
+async function downloadQrImage(btn) {
+  const src = document.getElementById('qr-image').dataset.qrSrc;
+  try {
+    const response = await fetch(src);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'qr-code.png';
+    a.click();
+    URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    window.open(src, '_blank');
+  }
 }
 
 async function copyQrImage(btn) {
