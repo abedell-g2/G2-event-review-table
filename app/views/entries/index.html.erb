@@ -90,7 +90,10 @@
     <div class="modal-body">
       <img id="qr-image" src="" alt="QR Code" class="qr-image" />
       <p id="qr-url-label" class="qr-url-label"></p>
-      <button class="elv-btn elv-btn--ghost" onclick="copyQrUrl()">Copy Image URL</button>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="elv-btn elv-btn--primary" onclick="copyQrImage(this)">Copy Image</button>
+        <a id="qr-download-link" href="" download="qr-code.png" class="elv-btn elv-btn--ghost">Download PNG</a>
+      </div>
     </div>
   </div>
 </div>
@@ -102,11 +105,23 @@ function showQrModal(url) {
   document.getElementById('qr-image').src = qrSrc;
   document.getElementById('qr-url-label').textContent = url;
   document.getElementById('qr-image').dataset.qrSrc = qrSrc;
+  document.getElementById('qr-download-link').href = qrSrc;
   document.getElementById('qr-modal').classList.remove('hidden');
 }
 
-function copyQrUrl() {
+async function copyQrImage(btn) {
   const src = document.getElementById('qr-image').dataset.qrSrc;
-  navigator.clipboard.writeText(src).then(() => alert('QR image URL copied!'));
+  try {
+    const response = await fetch(src);
+    const blob = await response.blob();
+    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = original, 2000);
+  } catch (err) {
+    // Fallback: copy the URL if image copy isn't supported
+    await navigator.clipboard.writeText(src);
+    alert('Image copy not supported in this browser — QR image URL copied instead.');
+  }
 }
 </script>
