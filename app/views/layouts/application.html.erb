@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>G2 Seller Solutions – Event Review Table</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%# Figtree font %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <%# Elevate Design System CSS %>
+    <link rel="stylesheet" href="https://www-ue-staging-1.g2.com/packs/elevate-application.css">
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="header-brand">
+          <img src="https://images.g2crowd.com/uploads/report_medal/image/1004367/G2_Logo_White.png"
+               alt="G2" class="header-logo" onerror="this.style.display='none'">
+          <div class="header-titles">
+            <span class="header-product">G2 Seller Solutions</span>
+            <span class="header-subtitle">Event Review Links</span>
+          </div>
+        </div>
+        <a href="https://www.g2.com/products/g2-seller-solutions/take_survey"
+           target="_blank" rel="noopener" class="header-link">
+          www.g2.com/products/g2-seller-solutions/take_survey
+        </a>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <%= yield %>
+    </main>
+  </body>
+</html>

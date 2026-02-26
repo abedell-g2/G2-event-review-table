@@ -1,0 +1,112 @@
+<div class="page-container">
+
+  <%# Flash messages %>
+  <% if notice %>
+    <div class="flash flash--notice"><%= notice %></div>
+  <% end %>
+  <% if alert %>
+    <div class="flash flash--alert"><%= alert %></div>
+  <% end %>
+
+  <%# Toolbar: search + import + add %>
+  <div class="toolbar">
+    <%= form_with url: root_path, method: :get, data: { turbo: false }, class: "search-form" do |f| %>
+      <div class="search-input-wrap">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+          <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/>
+        </svg>
+        <%= f.text_field :search, value: params[:search], placeholder: "Search by email or ID…", class: "elv-form-control search-input" %>
+      </div>
+      <%= f.submit "Search", class: "elv-btn elv-btn--ghost" %>
+      <% if params[:search].present? %>
+        <%= link_to "Clear", root_path, class: "elv-btn elv-btn--ghost" %>
+      <% end %>
+    <% end %>
+
+    <div class="toolbar-actions">
+      <%= form_with url: import_entries_path, method: :post, multipart: true, data: { turbo: false }, class: "import-form" do |f| %>
+        <%= f.file_field :file, accept: ".csv", class: "file-input", id: "csv-file-input", onchange: "this.form.submit()" %>
+        <label for="csv-file-input" class="elv-btn elv-btn--ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" style="margin-right:4px">
+            <path d="M9.25 13.25a.75.75 0 001.5 0V4.636l2.955 3.129a.75.75 0 001.09-1.03l-4.25-4.5a.75.75 0 00-1.09 0l-4.25 4.5a.75.75 0 101.09 1.03L9.25 4.636v8.614z"/>
+            <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"/>
+          </svg>
+          Import CSV
+        </label>
+      <% end %>
+
+      <button class="elv-btn elv-btn--primary" onclick="document.getElementById('add-entry-section').classList.toggle('hidden')">
+        + Add Entry
+      </button>
+    </div>
+  </div>
+
+  <%# Add Entry inline form %>
+  <div id="add-entry-section" class="add-entry-section hidden">
+    <%= render "entries/form", entry: @entry, show_email_col: @show_email_col %>
+  </div>
+
+  <%# Table %>
+  <div class="table-wrap">
+    <table class="elv-table entries-table">
+      <thead>
+        <tr>
+          <% if @show_email_col %>
+            <th class="col-email">Email</th>
+          <% end %>
+          <th class="col-id">ID Number</th>
+          <th class="col-link">Review Link</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="entries-tbody">
+        <%= render @entries, show_email_col: @show_email_col %>
+      </tbody>
+    </table>
+
+    <% if @entries.respond_to?(:total_count) && @entries.total_count == 0 %>
+      <div class="empty-state">No entries yet. Add one above or import a CSV.</div>
+    <% elsif @entries.respond_to?(:total_count) == false && @entries.empty? %>
+      <div class="empty-state">No entries match your search.</div>
+    <% end %>
+  </div>
+
+  <%# Pagination %>
+  <% if @paginated %>
+    <div class="pagination-wrap">
+      <%= paginate @entries %>
+    </div>
+  <% end %>
+
+</div>
+
+<%# QR Modal %>
+<div id="qr-modal" class="modal-backdrop hidden" data-controller="qr-modal" onclick="if(event.target===this) document.getElementById('qr-modal').classList.add('hidden')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">QR Code</span>
+      <button class="modal-close" onclick="document.getElementById('qr-modal').classList.add('hidden')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <img id="qr-image" src="" alt="QR Code" class="qr-image" />
+      <p id="qr-url-label" class="qr-url-label"></p>
+      <button class="elv-btn elv-btn--ghost" onclick="copyQrUrl()">Copy Image URL</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showQrModal(url) {
+  const encodedUrl = encodeURIComponent(url);
+  const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodedUrl;
+  document.getElementById('qr-image').src = qrSrc;
+  document.getElementById('qr-url-label').textContent = url;
+  document.getElementById('qr-image').dataset.qrSrc = qrSrc;
+  document.getElementById('qr-modal').classList.remove('hidden');
+}
+
+function copyQrUrl() {
+  const src = document.getElementById('qr-image').dataset.qrSrc;
+  navigator.clipboard.writeText(src).then(() => alert('QR image URL copied!'));
+}
+</script>

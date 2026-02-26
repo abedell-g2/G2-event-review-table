@@ -1,0 +1,25 @@
+<div id="entry-form" class="add-form-inner">
+  <%= form_with model: entry, url: entries_path, method: :post, data: { turbo_stream: true } do |f| %>
+    <div class="add-form-fields">
+      <% if show_email_col %>
+        <div class="form-field">
+          <%= f.label :email, "Email (optional)", class: "form-label" %>
+          <%= f.text_field :email, placeholder: "attendee@company.com", class: "elv-form-control" %>
+        </div>
+      <% end %>
+      <div class="form-field">
+        <%= f.label :id_number, "ID Number", class: "form-label" %>
+        <%= f.text_field :id_number, placeholder: "6-digit ID", maxlength: 6, class: "elv-form-control form-control--sm" %>
+      </div>
+      <div class="form-actions">
+        <%= f.submit "Add Entry", class: "elv-btn elv-btn--primary" %>
+        <button type="button" class="elv-btn elv-btn--ghost" onclick="document.getElementById('add-entry-section').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+    <% if entry.errors.any? %>
+      <div class="form-errors">
+        <%= entry.errors.full_messages.join(" · ") %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
